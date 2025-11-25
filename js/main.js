@@ -154,6 +154,72 @@ require([
       console.warn('Editor widget could not be created', e);
     }
 
+    // Basic input sanitization for Editor widget to reduce XSS risk.
+    // This intercepts user input/paste inside the Editor DOM and strips angle brackets.
+    (function attachEditorSanitizer() {
+      function sanitizeString(s) {
+        if (!s || typeof s !== 'string') return s;
+        // remove angle brackets and common script patterns
+        return s.replace(/</g, '').replace(/>/g, '').replace(/script\s*:/gi, '');
+      }
+
+      function isInsideEditor(node) {
+        if (!node || !node.closest) return false;
+        return !!node.closest('[class*="esri-editor"]');
+      }
+
+      // sanitize on input events inside editor
+      document.addEventListener('input', function (ev) {
+        const el = ev.target;
+        if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return;
+        if (!isInsideEditor(el)) return;
+        const clean = sanitizeString(el.value);
+        if (clean !== el.value) {
+          el.value = clean;
+        }
+      }, true);
+
+      // sanitize pasted content
+      document.addEventListener('paste', function (ev) {
+        const el = ev.target;
+        if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return;
+        if (!isInsideEditor(el)) return;
+        const pasted = (ev.clipboardData || window.clipboardData).getData('text');
+        const clean = sanitizeString(pasted);
+        if (clean !== pasted) {
+          ev.preventDefault();
+          // insert sanitized text at cursor
+          const start = el.selectionStart || 0;
+          const end = el.selectionEnd || 0;
+          const val = el.value;
+          el.value = val.slice(0, start) + clean + val.slice(end);
+          const pos = start + clean.length;
+          el.setSelectionRange(pos, pos);
+        }
+      }, true);
+
+      // before apply/save: sanitize all inputs in editor container
+      function sanitizeEditorFields() {
+        const editorNode = document.querySelector('[class*="esri-editor"]');
+        if (!editorNode) return;
+        const inputs = editorNode.querySelectorAll('input[type="text"], textarea');
+        inputs.forEach(i => {
+          i.value = sanitizeString(i.value);
+        });
+      }
+
+      // Hook save/apply buttons in editor (delegated)
+      document.addEventListener('click', function (ev) {
+        const btn = ev.target;
+        if (!(btn instanceof HTMLElement)) return;
+        if (!isInsideEditor(btn)) return;
+        const text = (btn.textContent || '').toLowerCase();
+        if (/save|apply|ok|submit/.test(text)) {
+          try { sanitizeEditorFields(); } catch (e) { /* ignore */ }
+        }
+      }, true);
+    })();
+
     // Prefill the input with the default layer and add it
     try {
       layerUrlInput.value = DEFAULT_LAYER_URL;
