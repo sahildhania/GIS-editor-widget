@@ -2,8 +2,11 @@ require([
   "esri/Map",
   "esri/views/MapView",
   "esri/layers/FeatureLayer",
-  "esri/widgets/Legend"
+  "esri/widgets/Legend",
+  "esri/widgets/Editor"
 ], function(Map, MapView, FeatureLayer, Legend) {
+
+  let Editor;
 
   const map = new Map({ basemap: "streets-vector" });
 
