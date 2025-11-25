@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GIS Editor Widget</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://js.arcgis.com/4.28/"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>GIS Editor Widget</h1>
+  </header>
+
+  <main class="container">
+    <div id="map" class="map" role="region" aria-label="Map view"></div>
+
+    <aside class="controls" aria-label="Layer controls">
+      <div class="control-block">
+        <label for="layerUrl">FeatureLayer / MapServer URL</label>
+        <input id="layerUrl" type="url" placeholder="https://.../FeatureServer/0 or .../MapServer/2">
+      </div>
+
+      <div class="control-row">
+        <button id="addBtn" class="btn">Add Layer</button>
+        <button id="clearBtn" class="btn btn-outline">Clear All</button>
+      </div>
+
+      <div class="control-block">
+        <label for="sampleSelect">Sample layers</label>
+        <select id="sampleSelect">
+          <option value="">— pick a sample —</option>
+          <option value="https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/2">USA States (sample)</option>
+          <option value="https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/9">USA Cities (sample)</option>
+        </select>
+      </div>
+
+      <div class="control-block">
+        <strong>Added layers</strong>
+        <div id="layersList" class="layers-list" aria-live="polite"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
