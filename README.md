@@ -8,6 +8,9 @@ Files added:
 - `js/main.js` — ArcGIS map and UI logic
  - Editor widget integrated to allow editing of editable FeatureLayers
 
+Default behavior:
+- On page load the Trailheads FeatureLayer is added automatically: `https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0`.
+
 Usage:
 1. Open `index.html` in a browser that can load the ArcGIS CDN (no build step required).
 2. Paste a FeatureLayer or MapServer sublayer URL into the input (or choose a sample) and click "Add Layer".

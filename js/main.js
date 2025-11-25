@@ -21,6 +21,9 @@ require([
   const clearBtn = document.getElementById('clearBtn');
   const sampleSelect = document.getElementById('sampleSelect');
 
+  // Default FeatureLayer to add on load
+  const DEFAULT_LAYER_URL = 'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0';
+
   const addedLayers = [];
 
   let editorWidget = null;
@@ -73,6 +76,8 @@ require([
     });
   }
 
+  
+
   function addLayerFromUrl(url) {
     if(!url) return;
     const fl = new FeatureLayer({ url });
@@ -122,6 +127,14 @@ require([
       view.ui.add(editorWidget, 'top-right');
     } catch (e) {
       console.warn('Editor widget could not be created', e);
+    }
+
+    // Prefill the input with the default layer and add it
+    try {
+      layerUrlInput.value = DEFAULT_LAYER_URL;
+      addLayerFromUrl(DEFAULT_LAYER_URL);
+    } catch (e) {
+      console.warn('Failed to add default layer', e);
     }
   });
 
