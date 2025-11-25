@@ -4,9 +4,7 @@ require([
   "esri/layers/FeatureLayer",
   "esri/widgets/Legend",
   "esri/widgets/Editor"
-], function(Map, MapView, FeatureLayer, Legend) {
-
-  let Editor;
+], function(Map, MapView, FeatureLayer, Legend, Editor) {
 
   const map = new Map({ basemap: "streets-vector" });
 
@@ -24,6 +22,14 @@ require([
   const sampleSelect = document.getElementById('sampleSelect');
 
   const addedLayers = [];
+
+  let editorWidget = null;
+
+  function updateEditorLayers() {
+    if (!editorWidget) return;
+    const layerInfos = addedLayers.map(e => ({ layer: e.layer }));
+    editorWidget.layerInfos = layerInfos;
+  }
 
   function renderLayers() {
     layersListEl.innerHTML = '';
@@ -55,6 +61,7 @@ require([
         const i = addedLayers.indexOf(entry);
         if(i>=0) addedLayers.splice(i,1);
         renderLayers();
+        updateEditorLayers();
       });
 
       div.appendChild(title);
@@ -74,6 +81,7 @@ require([
       addedLayers.push({ layer: fl, title });
       map.add(fl);
       renderLayers();
+      updateEditorLayers();
       // zoom to layer extent if available
       if(fl.fullExtent) view.goTo(fl.fullExtent).catch(()=>{});
     }).catch(err => {
@@ -91,6 +99,7 @@ require([
     addedLayers.slice().forEach(e => map.remove(e.layer));
     addedLayers.length = 0;
     renderLayers();
+    updateEditorLayers();
   });
 
   sampleSelect.addEventListener('change', () => {
@@ -106,6 +115,14 @@ require([
   view.when(() => {
     const legend = new Legend({ view });
     view.ui.add(legend, 'bottom-right');
+
+    // create Editor widget and add to UI (will show editable layers)
+    try {
+      editorWidget = new Editor({ view, layerInfos: [] });
+      view.ui.add(editorWidget, 'top-right');
+    } catch (e) {
+      console.warn('Editor widget could not be created', e);
+    }
   });
 
 });

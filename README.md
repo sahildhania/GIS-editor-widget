@@ -6,6 +6,7 @@ Files added:
 - `index.html` — main page with map and controls
 - `css/style.css` — responsive styles
 - `js/main.js` — ArcGIS map and UI logic
+ - Editor widget integrated to allow editing of editable FeatureLayers
 
 Usage:
 1. Open `index.html` in a browser that can load the ArcGIS CDN (no build step required).
