@@ -23,6 +23,8 @@ require([
 
   // Default FeatureLayer to add on load
   const DEFAULT_LAYER_URL = 'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0';
+  // A commonly used editable sample (may be reachable depending on network)
+  const EDITABLE_SAMPLE_URL = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/ServiceRequest/FeatureServer/0';
 
   const addedLayers = [];
 
@@ -30,8 +32,11 @@ require([
 
   function updateEditorLayers() {
     if (!editorWidget) return;
-    const layerInfos = addedLayers.map(e => ({ layer: e.layer }));
-    editorWidget.layerInfos = layerInfos;
+    // Only include layers that report edit capabilities
+    const editableInfos = addedLayers
+      .filter(e => e.editable)
+      .map(e => ({ layer: e.layer }));
+    editorWidget.layerInfos = editableInfos;
   }
 
   function renderLayers() {
@@ -43,6 +48,13 @@ require([
       const title = document.createElement('div');
       title.className = 'layer-title';
       title.textContent = entry.title || entry.layer.url || `Layer ${idx+1}`;
+
+      // editable badge
+      const badge = document.createElement('div');
+      badge.style.marginLeft = '8px';
+      badge.style.fontSize = '0.8rem';
+      badge.style.color = entry.editable ? '#0b6ef6' : '#888';
+      badge.textContent = entry.editable ? 'editable' : 'read-only';
 
       const toggleBtn = document.createElement('button');
       toggleBtn.textContent = entry.layer.visible ? 'Hide' : 'Show';
@@ -68,6 +80,7 @@ require([
       });
 
       div.appendChild(title);
+      div.appendChild(badge);
       div.appendChild(toggleBtn);
       div.appendChild(zoomBtn);
       div.appendChild(removeBtn);
@@ -83,7 +96,10 @@ require([
     const fl = new FeatureLayer({ url });
     fl.load().then(() => {
       const title = fl.title || fl.id || fl.url;
-      addedLayers.push({ layer: fl, title });
+      // determine editability from capabilities if available
+      const caps = (fl.capabilities || '').toString();
+      const editable = /Create|Update|Delete|Editing/i.test(caps);
+      addedLayers.push({ layer: fl, title, editable });
       map.add(fl);
       renderLayers();
       updateEditorLayers();
@@ -115,6 +131,15 @@ require([
       sampleSelect.selectedIndex = 0;
     }
   });
+
+  // Load editable sample button
+  const loadEditableBtn = document.getElementById('loadEditableBtn');
+  if (loadEditableBtn) {
+    loadEditableBtn.addEventListener('click', () => {
+      layerUrlInput.value = EDITABLE_SAMPLE_URL;
+      addLayerFromUrl(EDITABLE_SAMPLE_URL);
+    });
+  }
 
   // Add a Legend widget so symbology is visible when layers load
   view.when(() => {

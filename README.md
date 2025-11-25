@@ -10,6 +10,8 @@ Files added:
 
 Default behavior:
 - On page load the Trailheads FeatureLayer is added automatically: `https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0`.
+ - On page load the Trailheads FeatureLayer is added automatically: `https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0`.
+ - A button `Load Editable Sample` is available to add a commonly used editable sample (if reachable): `https://sampleserver6.arcgisonline.com/arcgis/rest/services/ServiceRequest/FeatureServer/0`.
 
 Usage:
 1. Open `index.html` in a browser that can load the ArcGIS CDN (no build step required).
