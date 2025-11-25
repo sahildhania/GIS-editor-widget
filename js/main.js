@@ -28,6 +28,55 @@ require([
 
   const addedLayers = [];
 
+  // Client-side wrapper to sanitize attributes before sending edits to the server.
+  // This is defense-in-depth; server-side validation is still required.
+  (function wrapApplyEdits() {
+    const original = FeatureLayer.prototype.applyEdits;
+    function sanitizeAttributeValue(v) {
+      if (v == null) return v;
+      if (typeof v !== 'string') return v;
+      // remove control chars
+      let s = v.replace(/[\x00-\x1F\x7F]/g, '');
+      // remove angle brackets
+      s = s.replace(/[<>]/g, '');
+      // strip dangerous words/patterns
+      s = s.replace(/javascript\s*:/gi, '');
+      s = s.replace(/\b(script|eval|prompt|alert|onerror|onload|new Function)\b/gi, '');
+      // remove template injection patterns
+      s = s.replace(/\$\{.*?\}/g, '');
+      // limit length
+      const MAX = 2000;
+      if (s.length > MAX) s = s.slice(0, MAX);
+      return s;
+    }
+
+    FeatureLayer.prototype.applyEdits = function () {
+      try {
+        const args = Array.from(arguments);
+        const edits = args[0] || {};
+        ['addFeatures', 'updateFeatures', 'deleteFeatures'].forEach(op => {
+          const list = edits[op] || (edits.features && (op === 'addFeatures' ? edits.features.add : null));
+          if (Array.isArray(list)) {
+            list.forEach(f => {
+              if (f && f.attributes) {
+                Object.keys(f.attributes).forEach(k => {
+                  try {
+                    f.attributes[k] = sanitizeAttributeValue(f.attributes[k]);
+                  } catch (e) {
+                    // ignore per-field errors
+                  }
+                });
+              }
+            });
+          }
+        });
+      } catch (e) {
+        console.warn('Sanitizer wrapper encountered an error', e);
+      }
+      return original.apply(this, arguments);
+    };
+  })();
+
   let editorWidget = null;
 
   function updateEditorLayers() {
