@@ -195,12 +195,36 @@ require([
     const legend = new Legend({ view });
     view.ui.add(legend, 'bottom-right');
 
-    // create Editor widget and add to UI (will show editable layers)
+    // create Editor widget and place in custom container (initially hidden)
     try {
       editorWidget = new Editor({ view, layerInfos: [] });
-      view.ui.add(editorWidget, 'top-right');
+      const editorContainer = document.getElementById('editorWidget');
+      if (editorContainer) {
+        editorWidget.container = editorContainer;
+      } else {
+        view.ui.add(editorWidget, 'top-right');
+      }
     } catch (e) {
       console.warn('Editor widget could not be created', e);
+    }
+
+    // Toggle expand/collapse editor
+    const expandBtn = document.getElementById('expandEditorBtn');
+    const closeBtn = document.getElementById('closeEditorBtn');
+    const editorPanel = document.getElementById('editorContainer');
+
+    if (expandBtn && editorPanel) {
+      expandBtn.addEventListener('click', () => {
+        editorPanel.classList.remove('hidden');
+        expandBtn.style.display = 'none';
+      });
+    }
+
+    if (closeBtn && editorPanel) {
+      closeBtn.addEventListener('click', () => {
+        editorPanel.classList.add('hidden');
+        if (expandBtn) expandBtn.style.display = 'block';
+      });
     }
 
     // Basic input sanitization for Editor widget to reduce XSS risk.

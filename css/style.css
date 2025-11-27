@@ -9,8 +9,15 @@ html,body,#map{height:100%}
 body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:var(--muted);background:var(--bg)}
 .topbar{background:#0b6ef6;color:#fff;padding:.6rem 1rem}
 .topbar h1{margin:0;font-size:1.05rem}
-.container{display:grid;grid-template-columns:1fr 320px;gap:12px;height:calc(100% - 52px)}
+.container{display:grid;grid-template-columns:1fr 320px;gap:12px;height:calc(100% - 52px);position:relative}
 .map{width:100%;height:100%}
+.editor-container{position:absolute;top:0;right:320px;bottom:0;width:380px;background:#fff;box-shadow:-2px 0 8px rgba(0,0,0,0.1);display:flex;flex-direction:column;z-index:100;transition:transform 0.3s ease,opacity 0.3s ease}
+.editor-container.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+.editor-header{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;background:#fafafa}
+.editor-header h3{margin:0;font-size:0.95rem}
+.editor-close-btn{background:none;border:none;cursor:pointer;font-size:1.5rem;padding:0;color:#888}
+.editor-close-btn:hover{color:#000}
+.editor-widget-inner{flex:1;overflow:auto;padding:12px}
 .controls{padding:12px;background:rgba(255,255,255,0.95);box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:auto}
 .control-block{margin-bottom:12px}
 .control-block label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px;color:#222}

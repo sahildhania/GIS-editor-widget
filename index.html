@@ -41,10 +41,23 @@
       </div>
 
       <div class="control-block">
+        <button id="expandEditorBtn" class="btn" style="width:100%;">📋 Expand Editor</button>
+      </div>
+
+      <div class="control-block">
         <strong>Added layers</strong>
         <div id="layersList" class="layers-list" aria-live="polite"></div>
       </div>
     </aside>
+
+    <!-- Editor widget container (initially hidden) -->
+    <div id="editorContainer" class="editor-container hidden" aria-label="Feature editor panel">
+      <div class="editor-header">
+        <h3>Feature Editor</h3>
+        <button id="closeEditorBtn" class="editor-close-btn">✕</button>
+      </div>
+      <div id="editorWidget" class="editor-widget-inner"></div>
+    </div>
   </main>
 
   <script src="js/main.js"></script>
