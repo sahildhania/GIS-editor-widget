@@ -84,7 +84,3 @@ To use a different ArcGIS JS API version, edit the script tag in `index.html`:
 - Safari 14+
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
-## License
-
-MIT (or add your license here)
-
